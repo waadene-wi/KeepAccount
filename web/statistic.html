@@ -1,0 +1,59 @@
+<html>
+    <head>
+        <title>Keep Account</title>
+        <link rel="stylesheet" type="text/css" href="common.css" /> 
+        <script src="echarts.js"></script>
+        <style>
+            #chart_area {
+                width: 600px;
+                height: 400px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="navi_bar">
+            <a class="navi" href="home.html">Home</a>
+            <a class="navi" href="add_record.html">Add Record</a>
+            <a class="navi" href="records.html">Records</a>
+            <a class="navi" href="statistic.html">Statistic</a>
+            <a class="navi" href="budget.html">Budget</a>
+            <a class="navi" href="category.html">Category</a>
+            <a class="navi" href="account.html">Account</a>
+        </div>
+        <div id="data_show">
+            <a href="#">收入各分類佔比</a>
+            <a href="#">支出各分類1佔比</a>
+            <a href="#">支出各分類2佔比</a>
+            <a href="#">收支趨勢圖</a>
+            <a href="#">收入分類1趨勢圖</a>
+            <a href="#">支出分類1趨勢圖</a>
+            <a href="#">支出分類2趨勢圖</a>
+            <a href="#"></a>
+            <div id="chart_area">
+
+            </div>
+        </div>
+    </body>
+    <script type="text/javascript">
+        var myChart = echarts.init(document.getElementById('chart_area'));
+        var option = {
+            title: {
+                text: 'ECharts 入门示例'
+            },
+            tooltip: {},
+            legend: {
+                data:['销量']
+            },
+            xAxis: {
+                data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
+            },
+            yAxis: {},
+            series: [{
+                name: '销量',
+                type: 'bar',
+                data: [5, 20, 36, 10, 10, 20]
+            }]
+        };
+        myChart.setOption(option);
+    </script>
+</html>

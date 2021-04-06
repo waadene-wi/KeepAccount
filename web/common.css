@@ -1,0 +1,17 @@
+.navi {
+    float: left;
+    margin-top : 2px;
+    margin-bottom : 2px;
+    margin-left : 3px;
+    margin-right: 3px;
+}
+#navi_bar {
+    height: 40px;
+    width: 600px;
+}
+#data_show {
+    width: 800px;
+}
+#hight_light_nav_opt {
+    background-color:gold;
+}

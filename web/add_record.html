@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <title>Keep Account</title>
+        <link rel="stylesheet" type="text/css" href="common.css" /> 
+        <style>
+            .one_input_layout { width: 320px; height: 25px; float: left;}
+            .one_line_layout { width: 720px; height: 30px;}
+            .input_line_element { 
+                float: left;
+                width: 128px; 
+                height: 20px;
+                margin-top: 8px;
+                margin-bottom: 8px;
+            }
+        </style>
+        <script type="text/javascript" src="common.js"></script>
+    </head>
+    <body>
+        <div id="navi_bar">
+            <a class="navi" href="home.html">Home</a>
+            <a id="hight_light_nav_opt" class="navi" href="add_record.html">Add Record</a>
+            <a class="navi" href="records.html">Records</a>
+            <a class="navi" href="statistic.html">Statistic</a>
+            <a class="navi" href="budget.html">Budget</a>
+            <a class="navi" href="category.html">Category</a>
+            <a class="navi" href="account.html">Account</a>
+        </div>
+        <div id="data_show">
+            <div class="one_line_layout">
+                <div class="one_input_layout" >
+                    <p class="input_line_element" >Type:</p>
+                    <select class="input_line_element" id="record_type_select" onchange="onRecordTypeChange()">
+                        <option value='income'>Income</option>
+                        <option value='payment'>Payment</option>
+                        <option value='transfer'>Transfer</option>
+                    </select>
+                </div>
+                <div class="one_input_layout" >
+                    <p class="input_line_element">Time:</p>
+                    <textarea class="input_line_element" id="time_input" ></textarea>
+                </div>
+            </div>
+            <div class="one_line_layout">
+                <div class="one_input_layout" >
+                    <p class="input_line_element" >Account:</p>
+                    <select class="input_line_element" id="account_select">
+                    </select>
+                </div>
+                <div class="one_input_layout" >
+                    <p class="input_line_element" >Amount:</p>
+                    <textarea class="input_line_element" id="amount_val"></textarea>
+                </div>
+            </div>
+            <div class="one_line_layout">
+                <div class="one_input_layout" >
+                    <p class="input_line_element" >Src Account:</p>
+                    <select class="input_line_element" id="src_account_select" disabled="true">
+                    </select>
+                </div>
+                <div class="one_input_layout" >
+                    <p class="input_line_element" >Dst Account:</p>
+                    <select class="input_line_element" id="dst_account_select" disabled="true">
+                    </select>
+                </div>
+            </div>
+            <div class="one_line_layout">
+                <div class="one_input_layout" >
+                    <p class="input_line_element" >Cat1:</p>
+                    <select class="input_line_element" id="cat1_select" onchange="onCat1SelectChange()">
+                        <!-- <option class="cat1_select_opt" value="0">Plase select</option> -->
+                    </select>
+                </div>
+                <div class="one_input_layout" >
+                    <p class="input_line_element" >Cat2:</p>
+                    <select class="input_line_element" id="cat2_select" disabled="true">
+                        <!-- <option class="cat2_select_opt"value="0">Plase select</option> -->
+                    </select>
+                </div>
+            </div>
+            <div class="one_input_layout" >
+                <p class="input_line_element" >Description:</p>
+                <textarea class="input_line_element" id="description_val"></textarea>
+            </div>
+            <button id="commit_button" onclick="onCommitClick()">Commit</a>
+        </div>
+    </body>
+    <script>
+        accountList = [];
+        var income_cat = [];
+        var payment_cat = [];
+        var transfer_cat = [];
+        var payment_cat1_cat2 = {};
+        var g_record_type; var g_current_time; var g_account_id;
+        var g_src_account_id; var g_dst_account_id; var g_cat1_id;
+        var g_cat2_id; var g_amount; var g_description;
+
+        function onCommitSuccess(result) {
+            var data = JSON.parse(result);
+            if(data.errno == 0) {
+                alert('successed~');
+            }
+            else {
+                alert('errno:' + data.errno + ' message:' + data.message);
+            }
+            document.getElementById('commit_button').disabled = false;
+        }
+
+        function onCommitClick() {
+            g_record_type = encodeURIComponent(document.getElementById('record_type_select').value);
+            g_current_time = encodeURIComponent(document.getElementById('time_input').value);
+            g_account_id = encodeURIComponent(document.getElementById('account_select').value);
+            g_src_account_id = encodeURIComponent(document.getElementById('src_account_select').value);
+            g_dst_account_id = encodeURIComponent(document.getElementById('dst_account_select').value);
+            g_cat1_id = encodeURIComponent(document.getElementById('cat1_select').value);
+            g_cat2_id = encodeURIComponent(document.getElementById('cat2_select').value);
+            g_amount = encodeURIComponent(document.getElementById('amount_val').value);
+            g_description = encodeURIComponent(document.getElementById('description_val').value);
+            uri = '';
+            if(g_record_type == 'income') {
+                uri = 'record/addIncome?account_id=' + g_account_id 
+                    + '&current_time=' + g_current_time + '&amount=' + g_amount
+                    + '&cat1_id=' + g_cat1_id + '&description=' + g_description;
+            }
+            else if(g_record_type == 'payment') {
+                uri = 'record/addPayment?account_id=' + g_account_id 
+                    + '&current_time=' + g_current_time + '&amount=' + g_amount
+                    + '&cat1_id=' + g_cat1_id + '&description=' + g_description
+                    + '&cat2_id=' + g_cat2_id;
+            }
+            else if(g_record_type == 'transfer') {
+                uri = 'record/addTransfer?src_account_id=' + g_src_account_id
+                    + '&dst_account_id=' + g_dst_account_id
+                    + '&current_time=' + g_current_time + '&amount=' + g_amount
+                    + '&cat1_id=' + g_cat1_id + '&description=' + g_description;
+            }
+            document.getElementById('commit_button').disabled = true;
+            getUrlAsyn(uri, onCommitSuccess);
+        }
+
+        function resetCat1Select(cat1_list) {
+            // 先刪除select下的所有選項
+            cat1_select = document.getElementById('cat1_select');
+            select_clearOptionsByClassname(cat1_select, 'cat1_select_opt');
+            // 再向select添加新的選項
+            cat1_list.forEach(function(ele) {
+                select_appendOption(cat1_select, ele.cat1_id, ele.name, 'cat1_select_opt');
+            });
+        }
+
+        function setPaymentCat1And2() {
+            resetCat1Select(payment_cat);
+            cat2_select = document.getElementById('cat2_select');
+            select_clearOptionsByClassname(cat2_select, 'cat2_select_opt');
+            selected_cat1_id = document.getElementById('cat1_select').selectedOptions.item(0).value
+            cat2_list = payment_cat[selected_cat1_id].cat2_list;
+            cat2_list.forEach(function(ele) {
+                select_appendOption(cat2_select, ele.cat2_id, ele.name, 'cat2_select_opt');
+            })
+        }
+
+        function onRecordTypeChange() {
+            var select = document.getElementById('record_type_select');
+            switch(select.value) {
+                case 'income':
+                    cat2_select = document.getElementById('cat2_select')
+                    cat2_select.disabled = true;
+                    document.getElementById('account_select').disabled = false;
+                    document.getElementById('src_account_select').disabled = true;
+                    document.getElementById('dst_account_select').disabled = true;
+                    document.getElementById('cat2_select').selectedIndex = 0;
+                    resetCat1Select(income_cat);
+                    select_clearOptionsByClassname(cat2_select, 'cat2_select_opt');
+                    break;
+                case 'payment':
+                    document.getElementById('cat2_select').disabled = false;
+                    document.getElementById('account_select').disabled = false;
+                    document.getElementById('src_account_select').disabled = true;
+                    document.getElementById('dst_account_select').disabled = true;
+                    setPaymentCat1And2();
+                    break;
+                case 'transfer':
+                    cat2_select = document.getElementById('cat2_select')
+                    cat2_select.disabled = true;
+                    document.getElementById('account_select').disabled = true;
+                    document.getElementById('src_account_select').disabled = false;
+                    document.getElementById('dst_account_select').disabled = false;
+                    document.getElementById('cat2_select').selectedIndex = 0;
+                    resetCat1Select(transfer_cat);
+                    select_clearOptionsByClassname(cat2_select, 'cat2_select_opt');
+                    break;
+                default: break;
+            }
+        } 
+
+        function onCat1SelectChange() {
+            // 只有在填寫payment的時候才處理
+            if(document.getElementById('record_type_select').value != 'payment') {
+                return;
+            }
+            cat2_select = document.getElementById('cat2_select');
+            select_clearOptionsByClassname(cat2_select, 'cat2_select_opt');
+            selected_cat1_id = document.getElementById('cat1_select').value;
+            cat2_list = payment_cat1_cat2[selected_cat1_id];
+            cat2_list.forEach(function(cat2_item) {
+               select_appendOption(cat2_select, cat2_item.cat2_id, cat2_item.name, 'cat2_select_opt') ;
+            });
+        }
+
+        function onAccountListReceived(result) {
+            var data = JSON.parse(result);
+            var opt = {};
+            accountList = data.return;
+            accountList.forEach(function(ele) {
+                opt1 = document.createElement('option');
+                opt2 = document.createElement('option');
+                opt3 = document.createElement('option');
+                opt1.value = ele.account_id; opt1.text = ele.name;
+                opt2.value = ele.account_id; opt2.text = ele.name;
+                opt3.value = ele.account_id; opt3.text = ele.name;
+                document.getElementById('account_select').appendChild(opt1);
+                document.getElementById('src_account_select').appendChild(opt2);
+                document.getElementById('dst_account_select').appendChild(opt3);
+            });
+        }
+
+        function onIncomeCategoryReceived(result) {
+            var data = JSON.parse(result);
+            income_cat = data.return;
+            resetCat1Select(income_cat);
+        }
+
+        function onPaymentCategoryReceived(result) {
+            var data = JSON.parse(result);
+            payment_cat = data.return;
+            payment_cat.forEach(function(item) {
+                cat1_id = item.cat1_id;
+                payment_cat1_cat2[cat1_id] = item.cat2_list;
+            });
+        }
+
+        function onTransferCategoryReceived(result) {
+            var data = JSON.parse(result);
+            transfer_cat = data.return;
+        }
+
+        // 獲取賬戶列表和分類列表
+        getUrlAsyn('/account/getAll', onAccountListReceived);
+        getUrlAsyn('/category/getIncome', onIncomeCategoryReceived);
+        getUrlAsyn('/category/getPayment', onPaymentCategoryReceived);
+        getUrlAsyn('/category/getTransfer', onTransferCategoryReceived);
+        document.getElementById('time_input').innerHTML = getDateTimeString();
+        
+    </script>
+</html>
