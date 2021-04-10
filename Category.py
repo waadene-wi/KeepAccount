@@ -28,7 +28,11 @@ class Category:
         if 'show_delete' in args and show_delete == 1:
             show_delete = True
         ret1 = self.db.getPaymentCategory1(show_delete)
+        if ret1['errno'] != Error.SUCCESS:
+            return ret1
         ret2 = self.db.getPaymentCategory2(show_delete)
+        if ret2['errno'] != Error.SUCCESS:
+            return ret2
         ret = {}
         for cat1_item in ret1['return']:
             cat1_id = cat1_item['cat1_id']

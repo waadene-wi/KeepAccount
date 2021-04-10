@@ -28,7 +28,7 @@ CREATE TABLE transfer_cat1(
 
 CREATE TABLE payment_cat2(
     cat1_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    cat1_id INTEGER NOT NULL,
+    cat2_id INTEGER NOT NULL,
     nameme VARCHAR(32) NOT NULL,
     showable TINYINT NOT NULL
 );
@@ -81,7 +81,7 @@ CREATE TABLE payment_record (
     timeme BIGINT NOT NULL,
     amount BIGINT NOT NULL,
     cat1_id INTEGER NOT NULL,
-    cat1_id INTEGER NOT NULL,
+    cat2_id INTEGER NOT NULL,
     describebe VARCHAR(72) NOT NULL,
     showable TINYINT NOT NULL
 );

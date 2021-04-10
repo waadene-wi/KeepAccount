@@ -18,6 +18,10 @@ def executeService(typeOfClass, method_name):
     return json.dumps(ret)
 
 
+@app.route('/')
+def default_index():
+    return flask.send_file('web/add_record.html')
+    
 @app.route('/test')
 def test():
     return 'Hello, World!'
