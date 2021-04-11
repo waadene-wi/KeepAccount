@@ -145,7 +145,7 @@
             select_clearOptionsByClassname(cat1_select, 'cat1_select_opt');
             // 再向select添加新的選項
             cat1_list.forEach(function(ele) {
-                select_appendOption(cat1_select, ele.cat1_id, ele.name, 'cat1_select_opt');
+                select_appendOption(cat1_select, ele.cat1_id, ele.nameme, 'cat1_select_opt');
             });
         }
 
@@ -156,7 +156,7 @@
             selected_cat1_id = document.getElementById('cat1_select').selectedOptions.item(0).value
             cat2_list = payment_cat[selected_cat1_id].cat2_list;
             cat2_list.forEach(function(ele) {
-                select_appendOption(cat2_select, ele.cat2_id, ele.name, 'cat2_select_opt');
+                select_appendOption(cat2_select, ele.cat2_id, ele.nameme, 'cat2_select_opt');
             })
         }
 
@@ -204,7 +204,7 @@
             selected_cat1_id = document.getElementById('cat1_select').value;
             cat2_list = payment_cat1_cat2[selected_cat1_id];
             cat2_list.forEach(function(cat2_item) {
-               select_appendOption(cat2_select, cat2_item.cat2_id, cat2_item.name, 'cat2_select_opt') ;
+               select_appendOption(cat2_select, cat2_item.cat2_id, cat2_item.nameme, 'cat2_select_opt') ;
             });
         }
 
@@ -216,9 +216,9 @@
                 opt1 = document.createElement('option');
                 opt2 = document.createElement('option');
                 opt3 = document.createElement('option');
-                opt1.value = ele.account_id; opt1.text = ele.name;
-                opt2.value = ele.account_id; opt2.text = ele.name;
-                opt3.value = ele.account_id; opt3.text = ele.name;
+                opt1.value = ele.account_id; opt1.text = ele.nameme;
+                opt2.value = ele.account_id; opt2.text = ele.nameme;
+                opt3.value = ele.account_id; opt3.text = ele.nameme;
                 document.getElementById('account_select').appendChild(opt1);
                 document.getElementById('src_account_select').appendChild(opt2);
                 document.getElementById('dst_account_select').appendChild(opt3);

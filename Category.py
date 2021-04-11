@@ -41,7 +41,7 @@ class Category:
         for cat2_item in ret2['return']:
             cat1_id = cat2_item['cat1_id']
             ret[cat1_id]['cat2_list'].append(cat2_item)
-        return list(ret.values())
+        return makeReturn(Error.SUCCESS, list(ret.values()))
 
     def getTransfer(self, args):
         show_delete = False
