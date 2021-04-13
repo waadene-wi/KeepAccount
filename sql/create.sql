@@ -27,8 +27,8 @@ CREATE TABLE transfer_cat1(
 );
 
 CREATE TABLE payment_cat2(
-    cat1_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    cat2_id INTEGER NOT NULL,
+    cat2_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    cat1_id INTEGER NOT NULL,
     nameme VARCHAR(32) NOT NULL,
     showable TINYINT NOT NULL
 );
@@ -37,7 +37,8 @@ CREATE TABLE currency (
     crc_id INTEGER PRIMARY KEY AUTOINCREMENT,
     nameme VARCHAR(32) NOT NULL,
     unit VARCHAR(32) NOT NULL,
-    characterter VARCHAR(8) NOT NULL
+    characterter VARCHAR(8) NOT NULL,
+    showable TINYINT NOT NULL
 );
 
 CREATE TABLE account (
@@ -50,7 +51,7 @@ CREATE TABLE account (
 
 CREATE TABLE account_balance (
     acnt_id INTEGER PRIMARY KEY,
-    BALANCECE BIGINT NOT NULL
+    balance BIGINT NOT NULL
 );
 
 CREATE TRIGGER add_account AFTER INSERT ON currency
@@ -99,23 +100,26 @@ CREATE TABLE transfer_record (
 
 CREATE TABLE daily_stat_record (
     timeme BIGINT NOT NULL,
+    crc_id INTEGER NOT NULL,
     income BIGINT NOT NULL,
     payment BIGINT NOT NULL,
-    PRIMARY KEY(timeme)
+    PRIMARY KEY(timeme, crc_id)
 );
 
 CREATE TABLE monthly_stat_record (
     timeme BIGINT NOT NULL,
+    crc_id INTEGER NOT NULL,
     income BIGINT NOT NULL,
     payment BIGINT NOT NULL,
-    PRIMARY KEY(timeme)
+    PRIMARY KEY(timeme, crc_id)
 );
 
 CREATE TABLE annually_stat_record (
     timeme BIGINT NOT NULL,
+    crc_id INTEGER NOT NULL,
     income BIGINT NOT NULL,
     payment BIGINT NOT NULL,
-    PRIMARY KEY(timeme)
+    PRIMARY KEY(timeme, crc_id)
 );
 
 -- 每個一級支出分類都必須有一條預算記錄，默認值為全零

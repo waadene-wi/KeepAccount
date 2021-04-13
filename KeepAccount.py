@@ -5,12 +5,14 @@ from Category import *
 from Record import *
 from Statistic import *
 from Budget import *
+from Currency import *
+from Common import *
 
 app = flask.Flask(__name__)
 app.debug = True
 
 def executeService(typeOfClass, method_name):
-    instance = typeOfClass()
+    instance = typeOfClass(app.logger)
     if hasattr(instance, method_name) == False:
         return json.dumps(makeReturn(Error.ILLEGAL_URL))
     args = flask.request.args.to_dict()
@@ -21,7 +23,7 @@ def executeService(typeOfClass, method_name):
 @app.route('/')
 def default_index():
     return flask.send_file('web/add_record.html')
-    
+
 @app.route('/test')
 def test():
     return 'Hello, World!'
@@ -49,6 +51,10 @@ def statistic_service(method_name):
 @app.route('/budget/<method_name>')
 def budget_service(method_name):
     return executeService(Budget, method_name)
+
+@app.route('/currency/<method_name>')
+def currency_service(method_name):
+    return executeService(Currency, method_name)
 
 if __name__ == '__main__':
     app.run()

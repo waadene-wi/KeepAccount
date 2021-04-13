@@ -14,6 +14,7 @@
                 margin-top: 8px;
                 margin-bottom: 8px;
             }
+            #commit_button { }
         </style>
         <script type="text/javascript" src="static/common.js"></script>
     </head>
@@ -44,13 +45,14 @@
             </div>
             <div class="one_line_layout">
                 <div class="one_input_layout" >
-                    <p class="input_line_element" >Account:</p>
-                    <select class="input_line_element" id="account_select">
+                    <p class="input_line_element" >Currency:</p>
+                    <select class="input_line_element" id="currency_select">
                     </select>
                 </div>
                 <div class="one_input_layout" >
-                    <p class="input_line_element" >Amount:</p>
-                    <textarea class="input_line_element" id="amount_val"></textarea>
+                    <p class="input_line_element" >Account:</p>
+                    <select class="input_line_element" id="account_select">
+                    </select>
                 </div>
             </div>
             <div class="one_line_layout">
@@ -79,9 +81,15 @@
                     </select>
                 </div>
             </div>
-            <div class="one_input_layout" >
-                <p class="input_line_element" >Description:</p>
-                <textarea class="input_line_element" id="description_val"></textarea>
+            <div class="one_line_layout" >
+                <div class="one_input_layout" >
+                    <p class="input_line_element" >Amount:</p>
+                    <textarea class="input_line_element" id="amount_val"></textarea>
+                </div>
+                <div class="one_input_layout" >
+                    <p class="input_line_element" >Description:</p>
+                    <textarea class="input_line_element" id="description_val"></textarea>
+                </div>
             </div>
             <button id="commit_button" onclick="onCommitClick()">Commit</a>
         </div>
@@ -92,6 +100,7 @@
         var payment_cat = [];
         var transfer_cat = [];
         var payment_cat1_cat2 = {};
+        var currency_account = {};
         var g_record_type; var g_current_time; var g_account_id;
         var g_src_account_id; var g_dst_account_id; var g_cat1_id;
         var g_cat2_id; var g_amount; var g_description;
@@ -207,6 +216,9 @@
                select_appendOption(cat2_select, cat2_item.cat2_id, cat2_item.nameme, 'cat2_select_opt') ;
             });
         }
+        function onCurrencyListReceived(result) {
+            
+        }
 
         function onAccountListReceived(result) {
             var data = JSON.parse(result);
@@ -216,9 +228,9 @@
                 opt1 = document.createElement('option');
                 opt2 = document.createElement('option');
                 opt3 = document.createElement('option');
-                opt1.value = ele.account_id; opt1.text = ele.nameme;
-                opt2.value = ele.account_id; opt2.text = ele.nameme;
-                opt3.value = ele.account_id; opt3.text = ele.nameme;
+                opt1.value = ele.acnt_id; opt1.text = ele.nameme;
+                opt2.value = ele.acnt_id; opt2.text = ele.nameme;
+                opt3.value = ele.acnt_id; opt3.text = ele.nameme;
                 document.getElementById('account_select').appendChild(opt1);
                 document.getElementById('src_account_select').appendChild(opt2);
                 document.getElementById('dst_account_select').appendChild(opt3);
@@ -246,6 +258,7 @@
         }
 
         // 獲取賬戶列表和分類列表
+        getUrlAsyn('/currency/getAll', onCurrencyListReceived);
         getUrlAsyn('/account/getAll', onAccountListReceived);
         getUrlAsyn('/category/getIncome', onIncomeCategoryReceived);
         getUrlAsyn('/category/getPayment', onPaymentCategoryReceived);
