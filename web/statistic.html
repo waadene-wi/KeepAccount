@@ -1,24 +1,76 @@
 <html>
     <head>
+        <meta charset='utf-8'>
         <title>Keep Account</title>
-        <link rel="stylesheet" type="text/css" href="common.css" /> 
-        <script src="echarts.js"></script>
+        <link rel="stylesheet" type="text/css" href="/res/common.css" /> 
         <style>
-            #chart_area {
-                width: 600px;
-                height: 400px;
+            .one_input_layout { width: 320px; height: 25px; float: left;}
+            .one_line_layout { width: 720px; height: 30px;}
+            .input_line_element { 
+                float: left;
+                width: 128px; 
+                height: 20px;
+                margin-top: 8px;
+                margin-bottom: 8px;
+            }
+            #main_data {
+                margin-top: 28px;
             }
         </style>
+        <script type="text/javascript" src="/res/common.js"></script>
+        <script type="text/javascript" src="/res/echarts.js"></script>
     </head>
     <body>
         <div id="navi_bar">
-            <a class="navi" href="home.html">Home</a>
-            <a class="navi" href="add_record.html">Add Record</a>
-            <a class="navi" href="records.html">Records</a>
-            <a class="navi" href="statistic.html">Statistic</a>
-            <a class="navi" href="budget.html">Budget</a>
-            <a class="navi" href="category.html">Category</a>
-            <a class="navi" href="account.html">Account</a>
+            <a class="navi" href="/home">Home</a>
+            <a class="navi" href="/add_record">Add Record</a>
+            <a class="navi" href="/records">Records</a>
+            <a class="navi" href="/statistic" id="hight_light_nav_opt">Statistic</a>
+            <a class="navi" href="/budget">Budget</a>
+            <a class="navi" href="/category">Category</a>
+            <a class="navi" href="/account">Account</a>
+        </div>
+        <div class="one_line_layout">
+            <div class="one_input_layout" >
+                <p class="input_line_element" >Statistic Type:</p>
+                <select class="input_line_element" id="statistic_type_select">
+                    <!-- <option class="statistic_type_select_opt" value="0">Plase select</option> -->
+                    <option class="statistic_type_select_opt" value="percentage">Percentage</option>
+                    <option class="statistic_type_select_opt" value="tendency">Tendency</option>
+                </select>
+            </div>
+            <div class="one_input_layout" >
+                <p class="input_line_element" >Statistic Item:</p>
+                <select class="input_line_element" id="statistic_item_select">
+                    <!-- <option class="statistic_item_select_opt" value="0">Plase select</option> -->
+                </select>
+            </div>
+        </div>
+        <div class="one_line_layout">
+            <div class="one_input_layout" >
+                <p class="input_line_element">Begin time:</p>
+                <textarea class="input_line_element" id="begin_time_input" ></textarea>
+            </div>
+            <div class="one_input_layout" >
+                <p class="input_line_element">End time:</p>
+                <textarea class="input_line_element" id="end_time_input" ></textarea>
+            </div>
+        </div>
+        <div class="one_line_layout">
+            <div class="one_input_layout" >
+                <p class="input_line_element" >Cat1:</p>
+                <select class="input_line_element" id="cat1_select" disabled="true">
+                    <!-- <option class="cat1_select_opt" value="0">Plase select</option> -->
+                    <option value="null">All</option>
+                </select>
+            </div>
+            <div class="one_input_layout" >
+                <p class="input_line_element" >Grouped By:</p>
+                <select class="input_line_element" id="time_interval_select">
+                    <option class="time_interval_select_opt" value="month">Month</option>
+                    <option class="time_interval_select_opt" value="year">Year</option>
+                </select>
+            </div>
         </div>
         <div id="data_show">
             <a href="#">收入各分類佔比</a>
