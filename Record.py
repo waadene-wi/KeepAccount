@@ -11,16 +11,31 @@ class Record:
     def test(self, args):
         return makeReturn(Error.SUCCESS, {'hello':'world', 'from':'record'})
 
-    def __specialArgsTransfer(self, args):
+    def __specialInputArgsTransfer(self, args):
         '''成功返回轉換後的args，否則返回-1'''
         if 'current_time' in args:
             args['current_time'] = timestampFromString(args['current_time'])
+        if 'begin_time' in args:
+            args['begin_time'] = timestampFromString(args['begin_time'])
+        if 'end_time' in args:
+            args['end_time'] = timestampFromString(args['end_time'])
         if 'amount' in args:
             args['amount'] = args['amount'] + '00'
         return args
 
+    def __specialValueTransfer(self, rows):
+        '''转换从数据库返回的数据中的某些值
+        没有返回值'''
+        for i in range(0, len(rows)):
+            if 'amount' in rows[i]:
+                rows[i]['amount'] = fenToYuanStr(rows[i]['amount'])
+            if 'timeme' in rows[i]:
+                rows[i]['timeme'] = timestampToString(rows[i]['timeme'])
+        return rows
+
     def addIncome(self, args):
         checker = DictParamChecker()
+        checker.addParam('currency_id', 'int', True)
         checker.addParam('account_id', 'int', True)
         checker.addParam('current_time', 'str', True)
         checker.addParam('amount', 'float', True)
@@ -29,13 +44,14 @@ class Record:
         args = checker.check(args)
         if type(args) == str:
             return makeReturn(Error.ILLEGAL_ARGS)
-        args = self.__specialArgsTransfer(args)
+        args = self.__specialInputArgsTransfer(args)
         if args == -1:
             return makeReturn(Error.ILLEGAL_ARGS)
         return self.db.call('addIncomeRecord', args)
 
     def addPayment(self, args):
         checker = DictParamChecker()
+        checker.addParam('currency_id', 'int', True)
         checker.addParam('account_id', 'int', True)
         checker.addParam('current_time', 'str', True)
         checker.addParam('amount', 'float', True)
@@ -45,13 +61,14 @@ class Record:
         args = checker.check(args)
         if type(args) == str:
             return makeReturn(Error.ILLEGAL_ARGS)
-        args = self.__specialArgsTransfer(args)
+        args = self.__specialInputArgsTransfer(args)
         if args == -1:
             return makeReturn(Error.ILLEGAL_ARGS)
         return self.db.call('addPaymentRecord', args)
 
     def addTransfer(self, args):
         checker = DictParamChecker()
+        checker.addParam('currency_id', 'int', True)
         checker.addParam('current_time', 'str', True)
         checker.addParam('amount', 'float', True)
         checker.addParam('cat1_id', 'int', True)
@@ -60,8 +77,9 @@ class Record:
         checker.addParam('description', 'str', False, '')
         args = checker.check(args)
         if type(args) == str:
+            self.logger.warning(args)
             return makeReturn(Error.ILLEGAL_ARGS)
-        args = self.__specialArgsTransfer(args)
+        args = self.__specialInputArgsTransfer(args)
         if args == -1:
             return makeReturn(Error.ILLEGAL_ARGS)
         return self.db.call('addTransferRecord', args)
@@ -70,9 +88,41 @@ class Record:
         checker = DictParamChecker()
         checker.addParam('begin_time', 'str', True)
         checker.addParam('end_time', 'str', True)
+        args = checker.check(args)
+        if type(args) == str:
+            self.logger.warning(args)
+            return makeReturn(Error.ILLEGAL_ARGS)
+        args = self.__specialInputArgsTransfer(args)
+        if args == -1:
+            return makeReturn(Error.ILLEGAL_ARGS)
+        dbData = self.db.call('getIncomeRecord', args)
+        if dbData['errno'] != Error.SUCCESS:
+            return dbData
+        dbData = self.__specialValueTransfer(dbData['return'])
+        return makeReturn(Error.SUCCESS, dbData)
 
     def getPayment(self, args):
-        pass
+        checker = DictParamChecker()
+        checker.addParam('begin_time', 'str', True)
+        checker.addParam('end_time', 'str', True)
+        args = checker.check(args)
+        if type(args) == str:
+            self.logger.warning(args)
+            return makeReturn(Error.ILLEGAL_ARGS)
+        args = self.__specialInputArgsTransfer(args)
+        if args == -1:
+            return makeReturn(Error.ILLEGAL_ARGS)
+        return self.db.call('getPaymentRecord', args)
 
     def getTransfer(self, args):
-        pass
+        checker = DictParamChecker()
+        checker.addParam('begin_time', 'str', True)
+        checker.addParam('end_time', 'str', True)
+        args = checker.check(args)
+        if type(args) == str:
+            self.logger.warning(args)
+            return makeReturn(Error.ILLEGAL_ARGS)
+        args = self.__specialInputArgsTransfer(args)
+        if args == -1:
+            return makeReturn(Error.ILLEGAL_ARGS)
+        return self.db.call('getPaymentRecord', args)

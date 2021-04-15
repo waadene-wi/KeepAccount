@@ -56,3 +56,26 @@ function select_appendOption(select_ele, val, text, class_name) {
     opt.className = class_name;
     select_ele.appendChild(opt);
 }
+
+// 根据crc_id更新account列表
+function resetAccountListByCurrencyId(crc_id, currency_account) {
+    // currency改变时，三个account的内容都要随之改变
+    // 清空account的选项
+    if(crc_id == 'null') {
+        return;
+    }
+    var account_select = document.getElementById('account_select')
+    var src_account_select = document.getElementById('src_account_select')
+    var dst_account_select = document.getElementById('dst_account_select')
+    select_clearOptionsByClassname(account_select, 'currency_select_opt');
+    select_clearOptionsByClassname(src_account_select, 'src_account_select_opt');
+    select_clearOptionsByClassname(dst_account_select, 'dst_account_select_opt');
+    // 添加新的选项
+    var account_list = currency_account[crc_id].account_list;
+    account_list.forEach(function(info){
+        select_appendOption(account_select, info.acnt_id, info.nameme, 'currency_select_opt');
+        select_appendOption(src_account_select, info.acnt_id, info.nameme, 'src_account_select_opt');
+        select_appendOption(dst_account_select, info.acnt_id, info.nameme, 'dst_account_select_opt');
+    });
+}
+

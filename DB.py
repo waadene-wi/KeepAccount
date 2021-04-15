@@ -54,7 +54,6 @@ class DB:
             sqlStr = sqlStr[:-2] + ' FROM ' + tableName
             if condition != '':
                 sqlStr += ' WHERE ' + condition
-            self.logger.warning(sqlStr)
             # 执行SQL语句，并获取结果
             connection = sqlite3.connect(DB_NAME)
             cursor = connection.cursor()
@@ -114,7 +113,6 @@ class DB:
         for info in accountInfo:
             crc_id = info['crc_id']
             ret[crc_id]['account_list'].append(info)
-        ret = list(ret.values())
         return makeReturn(Error.SUCCESS, ret)
 
     def getIncomeCategory(self, args):
@@ -154,6 +152,7 @@ class DB:
         return self.__selectData(attrs, 'transfer_cat1', condition, returnRaw)
 
     def addIncomeRecord(self, args):
+        crc_id = args['currency_id']
         acnt_id = args['account_id']
         timeme = args['current_time']
         amount = args['amount']
@@ -166,15 +165,16 @@ class DB:
         sqls = []
         sqls.append('INSERT INTO income_record(rcd_id, acnt_id, timeme, amount, cat1_id, describebe, showable) VALUES (NULL, %s, %s, %s, %s, \'%s\', 1)'%(acnt_id, timeme, amount, cat1_id, description))
         sqls.append('UPDATE account_balance SET balance = balance + %s WHERE acnt_id = acnt_id'%(amount))
-        sqls.append('INSERT OR IGNORE INTO daily_stat_record(timeme, income, payment) VALUES(%s, 0, 0)'%(dayTime))
-        sqls.append('UPDATE daily_stat_record SET income = income + %s WHERE timeme = %s'%(amount, dayTime))
-        sqls.append('INSERT OR IGNORE INTO monthly_stat_record(timeme, income, payment) VALUES(%s, 0, 0)'%(monthTime))
-        sqls.append('UPDATE monthly_stat_record SET income = income + %s WHERE timeme = %s'%(amount, monthTime))
-        sqls.append('INSERT OR IGNORE INTO annually_stat_record(timeme, income, payment) VALUES(%s, 0, 0)'%(yearTime))
-        sqls.append('UPDATE annually_stat_record SET income = income + %s WHERE timeme = %s'%(amount, yearTime))
+        sqls.append('INSERT OR IGNORE INTO daily_stat_record(timeme, crc_id, income, payment) VALUES(%s, %s, 0, 0)'%(dayTime, crc_id))
+        sqls.append('UPDATE daily_stat_record SET income = income + %s WHERE timeme = %s and crc_id = %s'%(amount, dayTime, crc_id))
+        sqls.append('INSERT OR IGNORE INTO monthly_stat_record(timeme, crc_id, income, payment) VALUES(%s, %s, 0, 0)'%(monthTime, crc_id))
+        sqls.append('UPDATE monthly_stat_record SET income = income + %s WHERE timeme = %s and crc_id = %s'%(amount, monthTime, crc_id))
+        sqls.append('INSERT OR IGNORE INTO annually_stat_record(timeme, crc_id, income, payment) VALUES(%s, %s, 0, 0)'%(yearTime, crc_id))
+        sqls.append('UPDATE annually_stat_record SET income = income + %s WHERE timeme = %s and crc_id = %s'%(amount, yearTime, crc_id))
         return self.executeTransaction(sqls)
 
     def addPaymentRecord(self, args):
+        crc_id = args['currency_id']
         acnt_id = args['account_id']
         timeme = args['current_time']
         amount = args['amount']
@@ -188,29 +188,50 @@ class DB:
         sqls = []
         sqls.append('INSERT INTO payment_record (rcd_id, acnt_id, timeme, amount, cat1_id, cat2_id, describebe, showable) VALUES (NULL, %s, %s, %s, %s, %s, \'%s\', 1)'%(acnt_id, timeme, amount, cat1_id, cat2_id, description))
         sqls.append('UPDATE account_balance SET balance = balance - %s WHERE acnt_id = acnt_id'%(amount))
-        sqls.append('INSERT OR IGNORE INTO daily_stat_record(timeme, income, payment) VALUES(%s, 0, 0)'%(dayTime))
-        sqls.append('UPDATE daily_stat_record SET payment = payment + %s WHERE timeme = %s'%(amount, dayTime))
-        sqls.append('INSERT OR IGNORE INTO monthly_stat_record(timeme, income, payment) VALUES(%s, 0, 0)'%(monthTime))
-        sqls.append('UPDATE monthly_stat_record SET payment = payment + %s WHERE timeme = %s'%(amount, monthTime))
-        sqls.append('INSERT OR IGNORE INTO annually_stat_record(timeme, income, payment) VALUES(%s, 0, 0)'%(yearTime))
-        sqls.append('UPDATE annually_stat_record SET payment = payment + %s WHERE timeme = %s'%(amount, yearTime))
+        sqls.append('INSERT OR IGNORE INTO daily_stat_record(timeme, crc_id, income, payment) VALUES(%s, %s, 0, 0)'%(dayTime, crc_id))
+        sqls.append('UPDATE daily_stat_record SET payment = payment + %s WHERE timeme = %s and crc_id = %s'%(amount, dayTime, crc_id))
+        sqls.append('INSERT OR IGNORE INTO monthly_stat_record(timeme, crc_id, income, payment) VALUES(%s, %s, 0, 0)'%(monthTime, crc_id))
+        sqls.append('UPDATE monthly_stat_record SET payment = payment + %s WHERE timeme = %s and crc_id = %s'%(amount, monthTime, crc_id))
+        sqls.append('INSERT OR IGNORE INTO annually_stat_record(timeme, crc_id, income, payment) VALUES(%s, %s, 0, 0)'%(yearTime, crc_id))
+        sqls.append('UPDATE annually_stat_record SET payment = payment + %s WHERE timeme = %s and crc_id = %s'%(amount, yearTime, crc_id))
         return self.executeTransaction(sqls)
 
     def addTransferRecord(self, args):
         timeme = args['current_time']
         amount = args['amount']
         cat1_id = args['cat1_id']
+        crc_id = args['currency_id']
         src_acnt_id = args['src_account_id']
         dst_acnt_id = args['dst_account_id']
         description = args['description']
         sqls = []
         sqls.append('INSERT INTO transfer_record (rcd_id, timeme, amount, cat1_id, src_acnt_id, dst_acnt_id, describebe, showable) VALUES (NULL, %s, %s, %s, %s, %s, \'%s\', 1)'%(timeme, amount, cat1_id, src_acnt_id, dst_acnt_id, description))
-        sqls.append('UPDATE account_balance SET balance = balance + %d WHERE acnt_id = %d'%(amount, dst_acnt_id))
-        sqls.append('UPDATE account_balance SET balance = balance - %d WHERE acnt_id = %d'%(amount, src_acnt_id))
+        sqls.append('UPDATE account_balance SET balance = balance + %s WHERE acnt_id = %s'%(amount, dst_acnt_id))
+        sqls.append('UPDATE account_balance SET balance = balance - %s WHERE acnt_id = %s'%(amount, src_acnt_id))
         return self.executeTransaction(sqls)
 
     def getIncomeRecord(self, args):
-        pass
+        begin_time = args['begin_time']
+        end_time = args['end_time']
+        condition = 'WHERE timeme >= %s and timeme <= %s '%(begin_time, end_time)
+        if 'account_id' in args:
+            condition += 'and acnt_id = %s'%(args['account_id'])
+        if 'cat1_id' in args:
+            condition += 'and cat1_id = %s'%(args['cat1_id'])
+        sqlStr = 'SELECT rcd_id, account.nameme, timeme, income_cat1.nameme, amount, describebe FROM \
+            (SELECT * FROM income_record %s ORDER BY timeme DESC) AS rslt \
+            LEFT JOIN account ON account.acnt_id = rslt.acnt_id \
+            LEFT JOIN income_cat1 ON income_cat1.cat1_id = rslt.cat1_id'%(condition)
+        try:
+            dbData = self.cursor.execute(sqlStr).fetchall()
+        except:
+            self.logger.warning('query failed. sql:' + sqlStr)
+            return makeReturn(Error.DATABASE_ERROR)
+        attrs = ['rcd_id', 'acnt_name', 'timeme', 'cat1_name', 'amount', 'describebe']
+        ret = []
+        for row in dbData:
+            ret.append(dict(zip(attrs, row)))
+        return makeReturn(Error.SUCCESS, ret)
 
     def getPaymentRecord(self, args):
         pass

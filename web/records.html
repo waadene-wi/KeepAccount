@@ -3,7 +3,7 @@
     <head>
         <meta charset='utf-8'>
         <title>Keep Account</title>
-        <link rel="stylesheet" type="text/css" href="static/common.css" /> 
+        <link rel="stylesheet" type="text/css" href="/res/common.css" /> 
         <style>
             .one_input_layout { width: 320px; height: 25px; float: left;}
             .one_line_layout { width: 720px; height: 30px;}
@@ -18,18 +18,18 @@
                 margin-top: 28px;
             }
         </style>
-        <script type="text/javascript" src="static/common.js"></script>
-        <script type="text/javascript" src="static/SimpleTable.js"></script>
+        <script type="text/javascript" src="/res/common.js"></script>
+        <script type="text/javascript" src="/res/SimpleTable.js"></script>
     </head>
     <body>
         <div id="navi_bar">
-            <a class="navi" href="/">Home</a>
-            <a class="navi" href="static/add_record.html">Add Record</a>
-            <a id="hight_light_nav_opt" class="navi" href="static/records.html">Records</a>
-            <a class="navi" href="static/statistic.html">Statistic</a>
-            <a class="navi" href="static/budget.html">Budget</a>
-            <a class="navi" href="static/category.html">Category</a>
-            <a class="navi" href="static/account.html">Account</a>
+            <a class="navi" href="/home">Home</a>
+            <a class="navi" href="/add_record">Add Record</a>
+            <a class="navi" href="/records" id="hight_light_nav_opt">Records</a>
+            <a class="navi" href="/statistic">Statistic</a>
+            <a class="navi" href="/budget">Budget</a>
+            <a class="navi" href="/category">Category</a>
+            <a class="navi" href="/account">Account</a>
         </div>
         <div id="data_show">
             <div class="one_line_layout">
@@ -39,6 +39,15 @@
                         <option value='income'>Income</option>
                         <option value='payment'>Payment</option>
                         <option value='transfer'>Transfer</option>
+                    </select>
+                </div>
+            </div>
+            <div class="one_line_layout">
+                <div class="one_input_layout" >
+                    <p class="input_line_element" >Currency:</p>
+                    <select class="input_line_element" id="currency_select" onchange="onCurrencySelectChange()">
+                        <option value="null">All</option>
+                        <!-- <option class="currency_select_opt" value="0">Plase select</option> -->
                     </select>
                 </div>
                 <div class="one_input_layout" >
@@ -115,14 +124,11 @@
             if(result.errno != 0) {
                 alert('errno:' + result.errno + ' message:' + result.message);
             }
-            var table_header = result.return.header;
+            var table_header = ['Record ID', 'Account Name', 'Time', 'Cat1 Name', 'Amount', 'Description'];
             var table = new SimpleTable(table_header.length, 'data_table');
             table.setHeader(table_header);
-            result.return.data.forEach(function(row) {
-                row_data = [];
-                table_header.forEach(function(name) {
-                    row_data.push(row[name]);
-                });
+            result.return.forEach(function(row) {
+                var row_data = [row.rcd_id, row.acnt_name, row.timeme, row.cat1_name, row.amount, row.describebe];
                 table.addRow(row_data);
             });
             table.show('main_data');
@@ -164,13 +170,13 @@
                 uri = '?' + uri.substr(1);
             }
             if(g_record_type == 'income') {
-                uri = 'record/getIncome' + uri;
+                uri = '/service/record/getIncome' + uri;
             }
             else if(g_record_type == 'payment') {
-                uri = 'record/getPayment' + uri;
+                uri = '/service/record/getPayment' + uri;
             }
             else if(g_record_type == 'transfer') {
-                uri = 'record/getTransfer' + uri;
+                uri = '/service/record/getTransfer' + uri;
             }
             document.getElementById('okay_button').disabled = true;
             getUrlAsyn(uri, onRecordsReturn);
@@ -182,7 +188,7 @@
             select_clearOptionsByClassname(cat1_select, 'cat1_select_opt');
             // 再向select添加新的選項
             cat1_list.forEach(function(ele) {
-                select_appendOption(cat1_select, ele.cat1_id, ele.name, 'cat1_select_opt');
+                select_appendOption(cat1_select, ele.cat1_id, ele.nameme, 'cat1_select_opt');
             });
         }
 
@@ -196,7 +202,7 @@
             }
             cat2_list = payment_cat[selected_cat1_id].cat2_list;
             cat2_list.forEach(function(ele) {
-                select_appendOption(cat2_select, ele.cat2_id, ele.name, 'cat2_select_opt');
+                select_appendOption(cat2_select, ele.cat2_id, ele.nameme, 'cat2_select_opt');
             })
         }
 
@@ -232,7 +238,12 @@
                     break;
                 default: break;
             }
-        } 
+        }
+
+        function onCurrencySelectChange() {
+            var crc_id = document.getElementById('currency_select').value;
+            resetAccountListByCurrencyId(crc_id, currency_account);
+        }
 
         function onCat1SelectChange() {
             // 只有在填寫payment的時候才處理
@@ -247,25 +258,24 @@
             }
             cat2_list = payment_cat1_cat2[selected_cat1_id];
             cat2_list.forEach(function(cat2_item) {
-               select_appendOption(cat2_select, cat2_item.cat2_id, cat2_item.name, 'cat2_select_opt') ;
+               select_appendOption(cat2_select, cat2_item.cat2_id, cat2_item.nameme, 'cat2_select_opt') ;
             });
         }
 
-        function onAccountListReceived(result) {
+        function onCurrencyAndAccountListReceived(result) {
             var data = JSON.parse(result);
             var opt = {};
-            accountList = data.return;
-            accountList.forEach(function(ele) {
-                opt1 = document.createElement('option');
-                opt2 = document.createElement('option');
-                opt3 = document.createElement('option');
-                opt1.value = ele.account_id; opt1.text = ele.name;
-                opt2.value = ele.account_id; opt2.text = ele.name;
-                opt3.value = ele.account_id; opt3.text = ele.name;
-                document.getElementById('account_select').appendChild(opt1);
-                document.getElementById('src_account_select').appendChild(opt2);
-                document.getElementById('dst_account_select').appendChild(opt3);
-            });
+            currency_account = data.return;
+            // 生成币种菜单
+            for(var crc_id in currency_account) {
+                currency_info = currency_account[crc_id]
+                opt = document.createElement('option');
+                opt.value = currency_info.crc_id;
+                opt.text = currency_info.nameme;
+                document.getElementById('currency_select').appendChild(opt);
+            }
+            // 用第一个crc_id生成账户菜单
+            resetAccountListByCurrencyId(Object.keys(currency_account)[0], currency_account);
         }
 
         function onIncomeCategoryReceived(result) {
@@ -289,11 +299,11 @@
         }
 
         // 獲取賬戶列表和分類列表
-        getUrlAsyn('/account/getAll', onAccountListReceived);
-        getUrlAsyn('/category/getIncome', onIncomeCategoryReceived);
-        getUrlAsyn('/category/getPayment', onPaymentCategoryReceived);
-        getUrlAsyn('/category/getTransfer', onTransferCategoryReceived);
+        getUrlAsyn('/service/account/getAllGroupedByCurrency', onCurrencyAndAccountListReceived);
+        getUrlAsyn('/service/category/getIncome', onIncomeCategoryReceived);
+        getUrlAsyn('/service/category/getPayment', onPaymentCategoryReceived);
+        getUrlAsyn('/service/category/getTransfer', onTransferCategoryReceived);
         document.getElementById('end_time_input').innerHTML = getDateTimeString();
-        // document.getElementById('begin_time_input').innerHTML = getDateTimeString(-1000 * (24 * 60 * 60)); // 一天前
+        document.getElementById('begin_time_input').innerHTML = getDateTimeString(-1000 * (24 * 60 * 60)); // 一天前
     </script>
 </html>
