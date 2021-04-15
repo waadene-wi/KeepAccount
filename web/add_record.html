@@ -14,7 +14,7 @@
                 margin-top: 8px;
                 margin-bottom: 8px;
             }
-            #commit_button { }
+            #commit_button { margin-top : 16px; margin-left : 16px; }
         </style>
         <script type="text/javascript" src="static/common.js"></script>
     </head>
@@ -95,7 +95,7 @@
         </div>
     </body>
     <script>
-        accountList = [];
+        currencyAccountList = [];
         var income_cat = [];
         var payment_cat = [];
         var transfer_cat = [];
@@ -216,15 +216,12 @@
                select_appendOption(cat2_select, cat2_item.cat2_id, cat2_item.nameme, 'cat2_select_opt') ;
             });
         }
-        function onCurrencyListReceived(result) {
-            
-        }
 
         function onAccountListReceived(result) {
             var data = JSON.parse(result);
             var opt = {};
-            accountList = data.return;
-            accountList.forEach(function(ele) {
+            currencyAccountList = data.return;
+            currencyAccountList.forEach(function(ele) {
                 opt1 = document.createElement('option');
                 opt2 = document.createElement('option');
                 opt3 = document.createElement('option');
@@ -258,8 +255,7 @@
         }
 
         // 獲取賬戶列表和分類列表
-        getUrlAsyn('/currency/getAll', onCurrencyListReceived);
-        getUrlAsyn('/account/getAll', onAccountListReceived);
+        getUrlAsyn('/account/getAllGroupedByCurrency', onAccountListReceived);
         getUrlAsyn('/category/getIncome', onIncomeCategoryReceived);
         getUrlAsyn('/category/getPayment', onPaymentCategoryReceived);
         getUrlAsyn('/category/getTransfer', onTransferCategoryReceived);

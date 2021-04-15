@@ -85,6 +85,38 @@ class DB:
             condition = 'showable = 1'
         return self.__selectData(attrs, 'account', condition, returnRaw)
 
+    def getAllAccountInfoGroupedByCurrency(self, args):
+        show_delete = args['show_delete']
+        returnRaw = args['return_raw']
+        attrs = ['acnt_id', 'crc_id', 'nameme', 'showable', 'deleteable']
+        condition = '' # 默认获取所有记录
+        if show_delete == False:
+            condition = 'showable = 1'
+        # 獲取賬戶信息
+        accountInfo = self.__selectData(attrs, 'account', condition, returnRaw)
+        if accountInfo['errno'] != Error.SUCCESS:
+            return accountInfo
+        else :
+            accountInfo = accountInfo['return']
+        # 獲取幣種信息
+        attrs = ['crc_id', 'nameme', 'unit', 'characterter', 'showable']
+        currencyInfo = self.__selectData(attrs, 'currency', condition, returnRaw)
+        if currencyInfo['errno'] != Error.SUCCESS:
+            return currencyInfo
+        else :
+            currencyInfo = currencyInfo['return']
+        # 把幣種和賬戶信息拼起來
+        ret = {}
+        for info in currencyInfo:
+            crc_id = info['crc_id']
+            info['account_list'] = []
+            ret[crc_id] = info
+        for info in accountInfo:
+            crc_id = info['crc_id']
+            ret[crc_id]['account_list'].append(info)
+        ret = list(ret.values())
+        return makeReturn(Error.SUCCESS, ret)
+
     def getIncomeCategory(self, args):
         show_delete = args['show_delete']
         returnRaw = args['return_raw']

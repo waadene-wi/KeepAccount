@@ -20,4 +20,9 @@ class Account:
     def getAll(self, args):
         args = self.__handleSpecialArgs(args)
         return self.db.call('getAllAccountInfo', args)
+
+    def getAllGroupedByCurrency(self, args):
+        args = self.__handleSpecialArgs(args)
+        return self.db.call('getAllAccountInfoGroupedByCurrency', args)
+
     
