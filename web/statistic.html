@@ -32,22 +32,6 @@
         </div>
         <div class="one_line_layout">
             <div class="one_input_layout" >
-                <p class="input_line_element" >Statistic Type:</p>
-                <select class="input_line_element" id="statistic_type_select">
-                    <!-- <option class="statistic_type_select_opt" value="0">Plase select</option> -->
-                    <option class="statistic_type_select_opt" value="percentage">Percentage</option>
-                    <option class="statistic_type_select_opt" value="tendency">Tendency</option>
-                </select>
-            </div>
-            <div class="one_input_layout" >
-                <p class="input_line_element" >Statistic Item:</p>
-                <select class="input_line_element" id="statistic_item_select">
-                    <!-- <option class="statistic_item_select_opt" value="0">Plase select</option> -->
-                </select>
-            </div>
-        </div>
-        <div class="one_line_layout">
-            <div class="one_input_layout" >
                 <p class="input_line_element">Begin time:</p>
                 <textarea class="input_line_element" id="begin_time_input" ></textarea>
             </div>
@@ -72,21 +56,27 @@
                 </select>
             </div>
         </div>
-        <div id="data_show">
-            <a href="#">收入各分類佔比</a>
-            <a href="#">支出各分類1佔比</a>
-            <a href="#">支出各分類2佔比</a>
-            <a href="#">收支趨勢圖</a>
-            <a href="#">收入分類1趨勢圖</a>
-            <a href="#">支出分類1趨勢圖</a>
-            <a href="#">支出分類2趨勢圖</a>
-            <a href="#"></a>
-            <div id="chart_area">
+        <div class="one_line_layout">
+            <input type="checkbox" value="income_cat1_percentage">Income Cat1 Percentage</input>
+            <input type="checkbox" value="payment_cat1_percentage">Payment Cat1 Percentage</input>
+        </div>
+        <div class="one_line_layout">
+            <input type="checkbox" value="payment_cat2_percentage">Payment Cat2 Percentage</input>
+            <input type="checkbox" value="income_payment_tendency">Income Payment Tendency</input>
+        </div>
+        <button id="okay_button" onclick="onOkayClick()">Okay</a>
+        <div id="chart_area">
 
-            </div>
         </div>
     </body>
     <script type="text/javascript">
+        function onOkayClick() {
+
+        }
+
+        document.getElementById('end_time_input').innerHTML = getDateTimeString();
+        document.getElementById('begin_time_input').innerHTML = getDateTimeString(-1000 * (24 * 60 * 60 * 365)); // 一年前
+
         var myChart = echarts.init(document.getElementById('chart_area'));
         var option = {
             title: {
