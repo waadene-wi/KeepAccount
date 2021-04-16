@@ -1,9 +1,9 @@
 from Common import *
-from DB import *
+import DB
 
 class Account:
     def __init__(self, logger):
-        self.db = DB(logger)
+        self.db = DB.DB(logger)
         self.logger = logger
 
     def __handleSpecialArgs(self, args):

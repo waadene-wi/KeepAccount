@@ -23,4 +23,4 @@ class Currency:
 
     def getAll(self, args):
         args = self.__handleSpecialArgs(args)
-        return self.db.call('getAllCurrency', args);
+        return self.db.call('getAllCurrency', args)

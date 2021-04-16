@@ -1,5 +1,5 @@
 from Common import *
-from DB import *
+import DB
 from DictParamChecker import *
 
 class Statistic:
@@ -16,10 +16,17 @@ class Statistic:
         args['end_time'] = timestampFromString(args['end_time'])
         return args
 
-    def getIncomePercentage(self, args):
+    def getIncomeCat1Percentage(self, args):
         checker = DictParamChecker()
         checker.addParam('begin_time', 'int', True)
         checker.addParam('end_time', 'int', True)
-        args = checker.check()
+        checker.addParam('interval', 'string', True)
+        args = checker.check(args)
         if type(args) == str:
-            self.logger
+            self.logger.warning(args)
+            return makeReturn(Error.ILLEGAL_ARGS)
+        args = self.__specialInputArgsTransfer(args)
+        ret = self.db.call('getIncomeCat1Percentage', args)
+        if ret['errno'] != Error.SUCCESS:
+            return ret
+        

@@ -234,10 +234,54 @@ class DB:
         return makeReturn(Error.SUCCESS, ret)
 
     def getPaymentRecord(self, args):
-        pass
+        begin_time = args['begin_time']
+        end_time = args['end_time']
+        condition = 'WHERE timeme >= %s and timeme <= %s '%(begin_time, end_time)
+        if 'account_id' in args:
+            condition += 'and acnt_id = %s'%(args['account_id'])
+        if 'cat1_id' in args:
+            condition += 'and cat1_id = %s'%(args['cat1_id'])
+        sqlStr = 'SELECT rcd_id, account.nameme, timeme, payment_cat1.nameme, payment_cat2.nameme, amount, describebe FROM \
+            (SELECT * FROM payment_record %s ORDER BY timeme DESC) AS rslt \
+            LEFT JOIN account ON account.acnt_id = rslt.acnt_id \
+            LEFT JOIN payment_cat1 ON payment_cat1.cat1_id = rslt.cat1_id \
+            LEFT JOIN payment_cat2 ON payment_cat2.cat2_id = rslt.cat2_id'%(condition)
+        try:
+            dbData = self.cursor.execute(sqlStr).fetchall()
+        except:
+            self.logger.warning('query failed. sql:' + sqlStr)
+            return makeReturn(Error.DATABASE_ERROR)
+        attrs = ['rcd_id', 'acnt_name', 'timeme', 'cat1_name', 'cat2_name', 'amount', 'describebe']
+        ret = []
+        for row in dbData:
+            ret.append(dict(zip(attrs, row)))
+        return makeReturn(Error.SUCCESS, ret)
 
     def getTransferRecord(self, args):
-        pass
+        begin_time = args['begin_time']
+        end_time = args['end_time']
+        condition = 'WHERE timeme >= %s and timeme <= %s '%(begin_time, end_time)
+        if 'src_account_id' in args:
+            condition += 'and src_acnt_id = %s'%(args['src_account_id'])
+        if 'dst_account_id' in args:
+            condition += 'and dst_acnt_id = %s'%(args['dst_account_id'])
+        if 'cat1_id' in args:
+            condition += 'and cat1_id = %s'%(args['cat1_id'])
+        sqlStr = 'SELECT rcd_id, timeme, acnt_1.nameme, acnt_2.nameme, transfer_cat1.nameme, amount, describebe FROM \
+            (SELECT * FROM transfer_record %s ORDER BY timeme DESC) AS rslt \
+            LEFT JOIN account AS acnt_1 ON acnt_1.acnt_id = rslt.src_acnt_id \
+            LEFT JOIN account AS acnt_2 ON acnt_2.acnt_id = rslt.dst_acnt_id \
+            LEFT JOIN transfer_cat1 ON transfer_cat1.cat1_id = rslt.cat1_id'%(condition)
+        try:
+            dbData = self.cursor.execute(sqlStr).fetchall()
+        except:
+            self.logger.warning('query failed. sql:' + sqlStr)
+            return makeReturn(Error.DATABASE_ERROR)
+        attrs = ['rcd_id', 'timeme', 'src_acnt_name', 'dst_acnt_name', 'cat1_name', 'amount', 'describebe']
+        ret = []
+        for row in dbData:
+            ret.append(dict(zip(attrs, row)))
+        return makeReturn(Error.SUCCESS, ret)
 
     def getAllCurrency(self, args):
         attrs = ['crc_id', 'nameme', 'unit', 'characterter', 'showable']
@@ -247,3 +291,9 @@ class DB:
         if show_delete == False:
             condition = 'showable = 1'
         return self.__selectData(attrs, 'currency', condition, returnRaw)
+
+    def getIncomeCat1Percentage(self, args):
+        begin_time = args['begin_time']
+        end_time = args['end_time']
+        interval = args['interval']
+        

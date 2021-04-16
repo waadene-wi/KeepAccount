@@ -112,7 +112,11 @@ class Record:
         args = self.__specialInputArgsTransfer(args)
         if args == -1:
             return makeReturn(Error.ILLEGAL_ARGS)
-        return self.db.call('getPaymentRecord', args)
+        dbData = self.db.call('getPaymentRecord', args)
+        if dbData['errno'] != Error.SUCCESS:
+            return dbData
+        dbData = self.__specialValueTransfer(dbData['return'])
+        return makeReturn(Error.SUCCESS, dbData)
 
     def getTransfer(self, args):
         checker = DictParamChecker()
@@ -125,4 +129,8 @@ class Record:
         args = self.__specialInputArgsTransfer(args)
         if args == -1:
             return makeReturn(Error.ILLEGAL_ARGS)
-        return self.db.call('getPaymentRecord', args)
+        dbData = self.db.call('getTransferRecord', args)
+        if dbData['errno'] != Error.SUCCESS:
+            return dbData
+        dbData = self.__specialValueTransfer(dbData['return'])
+        return makeReturn(Error.SUCCESS, dbData)

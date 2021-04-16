@@ -116,7 +116,7 @@
         var g_record_type; var begin_time_input; var end_time_input; var g_account_id;
         var g_src_account_id; var g_dst_account_id; var g_cat1_id;
         var g_cat2_id; var g_amount; var g_description;
-
+        
         function onRecordsReturn(result) {
             // 解析返回數據內容
             // 生成表格并顯示
@@ -124,13 +124,32 @@
             if(result.errno != 0) {
                 alert('errno:' + result.errno + ' message:' + result.message);
             }
-            var table_header = ['Record ID', 'Account Name', 'Time', 'Cat1 Name', 'Amount', 'Description'];
+            var record_type = document.getElementById('record_type_select').value;
+            var table_headers = {
+                income: ['Record ID', 'Time', 'Account Name', 'Cat1 Name', 'Amount', 'Description'],
+                payment: ['Record ID', 'Time', 'Account Name', 'Cat1 Name', 'Cat2 Name', 'Amount', 'Description'],
+                transfer: ['Record ID', 'Time', 'SRC Account Name', 'DST Account Name', 'Cat1 Name', 'Amount', 'Description']};
+            var table_header = table_headers[record_type];
             var table = new SimpleTable(table_header.length, 'data_table');
             table.setHeader(table_header);
-            result.return.forEach(function(row) {
-                var row_data = [row.rcd_id, row.acnt_name, row.timeme, row.cat1_name, row.amount, row.describebe];
-                table.addRow(row_data);
-            });
+            if(record_type == 'income') {
+                result.return.forEach(function(row) {
+                    var row_data = [row.rcd_id, row.timeme, row.acnt_name, row.cat1_name, row.amount, row.describebe];
+                    table.addRow(row_data);
+                });
+            }
+            else if (record_type == 'payment') {
+                result.return.forEach(function(row) {
+                    var row_data = [row.rcd_id, row.timeme, row.acnt_name, row.cat1_name, row.cat2_name, row.amount, row.describebe];
+                    table.addRow(row_data);
+                });
+            }
+            else if (record_type == 'transfer') {
+                result.return.forEach(function(row) {
+                    var row_data = [row.rcd_id, row.timeme, row.src_acnt_name, row.dst_acnt_name, row.cat1_name, row.amount, row.describebe];
+                    table.addRow(row_data);
+                });
+            }
             table.show('main_data');
             document.getElementById('okay_button').disabled = false;
         }
