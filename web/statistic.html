@@ -57,46 +57,100 @@
             </div>
         </div>
         <div class="one_line_layout">
-            <input type="checkbox" value="income_cat1_percentage">Income Cat1 Percentage</input>
+            <div class="one_input_layout" >
+                <p class="input_line_element" >Currency:</p>
+                <select class="input_line_element" id="currency_select">
+                    <!-- <option class="currency_select_opt" value="0"> </option> -->
+                </select>
+            </div>
         </div>
         <div class="one_line_layout">
-            <input type="checkbox" value="payment_cat1_percentage">Payment Cat1 Percentage</input>
+            <input type="checkbox" value="income_cat1_percentage" id="income_cat1_percentage_check">Income Cat1 Percentage</input>
         </div>
         <div class="one_line_layout">
-            <input type="checkbox" value="income_payment_tendency">Income Payment Tendency</input>
+            <input type="checkbox" value="payment_cat1_percentage" id="payment_cat1_percentage_check">Payment Cat1 Percentage</input>
         </div>
-        <button id="okay_button" onclick="onOkayClick()">Okay</a>
-        <div id="chart_area">
-
+        <div class="one_line_layout">
+            <input type="checkbox" value="income_payment_tendency" id="income_payment_tendency_check">Income Payment Tendency</input>
+        </div>
+        <button id="okay_button" onclick="onOkayClick()">Okay</button>
+        <div id="charts_area" style="width: 800px;height:600px;">
+            <!-- <div class="one_chart"></div> -->
         </div>
     </body>
     <script type="text/javascript">
-        function onOkayClick() {
+        function onIncomeCat1PercnetageReceived(result) {
+            var data = JSON.parse(result);
+            data = data.return;
+            var chart = echarts.init(document.getElementById('income_cat1_percentage_chart'));
+            var option = {
+                title:{text:'Income Cat1 Percentage'},
+                series: [{
+                    name: 'Income Cat1 Percentage',
+                    type: 'pie',
+                    radius: '50%',
+                    data:[]}]
+            };
+            data.forEach(function(info) {
+                option.series[0].data.push({value:info.amount, name:info.cat1_name});
+            });
+            chart.setOption(option);
+        }
 
+        function onPaymentCat1PercnetageReceived(result) {
+            var data = JSON.parse(result);
+            data = data.return;
+            var chart = echarts.init(document.getElementById('payment_cat1_percentage_chart'));
+            var option = {
+                title:{text:'Income Cat1 Percentage'},
+                series: [{
+                    name: 'Income Cat1 Percentage',
+                    type: 'pie',
+                    radius: '50%',
+                    data:[]}]
+            };
+            data.forEach(function(info) {
+                option.series[0].data.push({value:info.amount, name:info.cat1_name});
+            });
+            chart.setOption(option);
+        }
+
+        function onOkayClick() {
+            var is_checked;
+            var begin_time = document.getElementById('begin_time_input').value;
+            var end_time = document.getElementById('end_time_input').value;
+            var currency_id = document.getElementById('currency_select').value;
+            var charts_area_div = document.getElementById('charts_area')
+
+            clearSubElement(charts_area_div, 'one_chart');
+            is_checked = document.getElementById('income_cat1_percentage_check').checked;
+            if(is_checked == true) {
+                addCharDiv('charts_area', 'income_cat1_percentage_chart', 'one_chart', '600px', '400px');
+                uri = '/service/statistic/getIncomeCat1Percentage?begin_time='
+                    + begin_time + '&end_time=' + end_time + '&currency_id=' + currency_id;
+                getUrlAsyn(uri, onIncomeCat1PercnetageReceived);
+            }
+            is_checked = document.getElementById('payment_cat1_percentage_check').checked;
+            if(is_checked == true) {
+                addCharDiv('charts_area', 'payment_cat1_percentage_chart', 'one_chart', '600px', '400px');
+                uri = '/service/statistic/getPaymentCat1Percentage?begin_time='
+                    + begin_time + '&end_time=' + end_time + '&currency_id=' + currency_id;
+                getUrlAsyn(uri, onPaymentCat1PercnetageReceived);
+            }
+        }
+
+        function onCurrencyReceived(result) {
+            var data = JSON.parse(result);
+            var currency = data.return;
+            var currency_select = document.getElementById('currency_select');
+            clearSubElement(currency_select, 'currency_select_opt');
+            currency.forEach(function(crc){
+                appendSelectorOption(currency_select, crc.crc_id, crc.nameme, 'currency_select_opt');
+            });
         }
 
         document.getElementById('end_time_input').innerHTML = getDateTimeString();
         document.getElementById('begin_time_input').innerHTML = getDateTimeString(-1000 * (24 * 60 * 60 * 365)); // 一年前
-
-        var myChart = echarts.init(document.getElementById('chart_area'));
-        var option = {
-            title: {
-                text: 'ECharts 入门示例'
-            },
-            tooltip: {},
-            legend: {
-                data:['销量']
-            },
-            xAxis: {
-                data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
-            },
-            yAxis: {},
-            series: [{
-                name: '销量',
-                type: 'bar',
-                data: [5, 20, 36, 10, 10, 20]
-            }]
-        };
-        myChart.setOption(option);
+        getUrlAsyn('/service/currency/getAll', onCurrencyReceived);
     </script>
 </html>

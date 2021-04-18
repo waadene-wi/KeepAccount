@@ -36,20 +36,20 @@ function getDateTimeString(offset_ms=0) {
     return Y + '-' + M + '-' + D + ' ' + h + ':' + m;
 }
 
-// 清空選項菜單的所有選項
-function select_clearOptionsByClassname(select_ele, opt_class) {
-    options =  select_ele.getElementsByClassName(opt_class);
+// 清空元素中指定class的子元素
+function clearSubElement(element, sub_ele_class) {
+    options =  element.getElementsByClassName(sub_ele_class);
     while(true) {
         opt = options.item(0);
         if(opt == null) {
             break;
         }
-        select_ele.removeChild(opt);
+        element.removeChild(opt);
     }
 }
 
 // 向選項菜單中追加一個選項
-function select_appendOption(select_ele, val, text, class_name) {
+function appendSelectorOption(select_ele, val, text, class_name) {
     opt = document.createElement('option')
     opt.text = text;
     opt.value = val;
@@ -67,15 +67,26 @@ function resetAccountListByCurrencyId(crc_id, currency_account) {
     var account_select = document.getElementById('account_select')
     var src_account_select = document.getElementById('src_account_select')
     var dst_account_select = document.getElementById('dst_account_select')
-    select_clearOptionsByClassname(account_select, 'currency_select_opt');
-    select_clearOptionsByClassname(src_account_select, 'src_account_select_opt');
-    select_clearOptionsByClassname(dst_account_select, 'dst_account_select_opt');
+    clearSubElement(account_select, 'currency_select_opt');
+    clearSubElement(src_account_select, 'src_account_select_opt');
+    clearSubElement(dst_account_select, 'dst_account_select_opt');
     // 添加新的选项
     var account_list = currency_account[crc_id].account_list;
     account_list.forEach(function(info){
-        select_appendOption(account_select, info.acnt_id, info.nameme, 'currency_select_opt');
-        select_appendOption(src_account_select, info.acnt_id, info.nameme, 'src_account_select_opt');
-        select_appendOption(dst_account_select, info.acnt_id, info.nameme, 'dst_account_select_opt');
+        appendSelectorOption(account_select, info.acnt_id, info.nameme, 'currency_select_opt');
+        appendSelectorOption(src_account_select, info.acnt_id, info.nameme, 'src_account_select_opt');
+        appendSelectorOption(dst_account_select, info.acnt_id, info.nameme, 'dst_account_select_opt');
     });
+}
+
+// 向一個div中添加echart的div
+function addCharDiv(parentId, chartAreaId, charAreaClass, width, height) {
+    var parent = document.getElementById(parentId);
+    var newDiv = document.createElement('div');
+    newDiv.setAttribute('id', chartAreaId);
+    newDiv.setAttribute('class', charAreaClass);
+    newDiv.style.width = width;
+    newDiv.style.height = height;
+    parent.appendChild(newDiv);
 }
 

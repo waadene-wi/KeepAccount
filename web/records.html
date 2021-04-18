@@ -204,24 +204,24 @@
         function resetCat1Select(cat1_list) {
             // 先刪除select下的所有選項
             cat1_select = document.getElementById('cat1_select');
-            select_clearOptionsByClassname(cat1_select, 'cat1_select_opt');
+            clearSubElement(cat1_select, 'cat1_select_opt');
             // 再向select添加新的選項
             cat1_list.forEach(function(ele) {
-                select_appendOption(cat1_select, ele.cat1_id, ele.nameme, 'cat1_select_opt');
+                appendSelectorOption(cat1_select, ele.cat1_id, ele.nameme, 'cat1_select_opt');
             });
         }
 
         function setPaymentCat1And2() {
             resetCat1Select(payment_cat);
             cat2_select = document.getElementById('cat2_select');
-            select_clearOptionsByClassname(cat2_select, 'cat2_select_opt');
+            clearSubElement(cat2_select, 'cat2_select_opt');
             selected_cat1_id = document.getElementById('cat1_select').selectedOptions.item(0).value
             if(selected_cat1_id == "null") {
                 return;
             }
             cat2_list = payment_cat[selected_cat1_id].cat2_list;
             cat2_list.forEach(function(ele) {
-                select_appendOption(cat2_select, ele.cat2_id, ele.nameme, 'cat2_select_opt');
+                appendSelectorOption(cat2_select, ele.cat2_id, ele.nameme, 'cat2_select_opt');
             })
         }
 
@@ -236,7 +236,7 @@
                     document.getElementById('dst_account_select').disabled = true;
                     document.getElementById('cat2_select').selectedIndex = 0;
                     resetCat1Select(income_cat);
-                    select_clearOptionsByClassname(cat2_select, 'cat2_select_opt');
+                    clearSubElement(cat2_select, 'cat2_select_opt');
                     break;
                 case 'payment':
                     document.getElementById('cat2_select').disabled = false;
@@ -253,7 +253,7 @@
                     document.getElementById('dst_account_select').disabled = false;
                     document.getElementById('cat2_select').selectedIndex = 0;
                     resetCat1Select(transfer_cat);
-                    select_clearOptionsByClassname(cat2_select, 'cat2_select_opt');
+                    clearSubElement(cat2_select, 'cat2_select_opt');
                     break;
                 default: break;
             }
@@ -270,14 +270,14 @@
                 return;
             }
             cat2_select = document.getElementById('cat2_select');
-            select_clearOptionsByClassname(cat2_select, 'cat2_select_opt');
+            clearSubElement(cat2_select, 'cat2_select_opt');
             selected_cat1_id = document.getElementById('cat1_select').value;
             if(selected_cat1_id == "null") {
                 return;
             }
             cat2_list = payment_cat1_cat2[selected_cat1_id];
             cat2_list.forEach(function(cat2_item) {
-               select_appendOption(cat2_select, cat2_item.cat2_id, cat2_item.nameme, 'cat2_select_opt') ;
+               appendSelectorOption(cat2_select, cat2_item.cat2_id, cat2_item.nameme, 'cat2_select_opt') ;
             });
         }
 

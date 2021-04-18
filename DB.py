@@ -295,5 +295,39 @@ class DB:
     def getIncomeCat1Percentage(self, args):
         begin_time = args['begin_time']
         end_time = args['end_time']
-        interval = args['interval']
+        crc_id = args['currency_id']
+        sqlStr = 'SELECT income_cat1.nameme, SUM(amount) FROM income_record\
+            LEFT JOIN account on income_record.acnt_id = account.acnt_id\
+            LEFT JOIN income_cat1 on income_record.cat1_id = income_cat1.cat1_id\
+            WHERE account.crc_id = %s and income_record.timeme BETWEEN %s AND %s GROUP BY income_record.cat1_id'%(crc_id, begin_time, end_time)
+        try:
+            dbData = self.cursor.execute(sqlStr).fetchall()
+        except:
+            self.logger.warning('query failed. sql:' + sqlStr)
+            return makeReturn(Error.DATABASE_ERROR)
+        attrs = ['cat1_name', 'amount']
+        ret = []
+        for row in dbData:
+            ret.append(dict(zip(attrs, row)))
+        return makeReturn(Error.SUCCESS, ret)
+
+    def getPaymentCat1Percentage(self, args):
+        begin_time = args['begin_time']
+        end_time = args['end_time']
+        crc_id = args['currency_id']
+        sqlStr = 'SELECT payment_cat1.nameme, SUM(amount) FROM payment_record\
+            LEFT JOIN account on payment_record.acnt_id = account.acnt_id\
+            LEFT JOIN payment_cat1 on payment_record.cat1_id = payment_cat1.cat1_id\
+            WHERE account.crc_id = %s and payment_record.timeme BETWEEN %s AND %s GROUP BY payment_record.cat1_id'%(crc_id, begin_time, end_time)
+        try:
+            dbData = self.cursor.execute(sqlStr).fetchall()
+        except:
+            self.logger.warning('query failed. sql:' + sqlStr)
+            return makeReturn(Error.DATABASE_ERROR)
+        attrs = ['cat1_name', 'amount']
+        ret = []
+        for row in dbData:
+            ret.append(dict(zip(attrs, row)))
+        return makeReturn(Error.SUCCESS, ret)
+        
         

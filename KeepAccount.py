@@ -24,6 +24,10 @@ def executeService(typeOfClass, method_name):
 def default_index():
     return flask.send_file('web/add_record.html')
 
+@app.route('/favicon.ico')
+def favicon():
+    return flask.send_file('web/favicon.ico')
+
 @app.route('/test')
 def test():
     return 'Hello, World!'
