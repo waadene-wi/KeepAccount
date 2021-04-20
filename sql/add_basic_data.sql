@@ -93,6 +93,8 @@ INSERT INTO transfer_cat1 (cat1_id, nameme, showable) VALUES(NULL, "RETURN IN", 
 INSERT INTO transfer_cat1 (cat1_id, nameme, showable) VALUES(NULL, "OTHER", 1);
 
 -- 添加默認幣種
-INSERT INTO currency (crc_id, nameme, unit, characterter, showable) VALUES(1, "CNY", "Yuan", "￥", 1);
+INSERT INTO currency (crc_id, nameme, unit, characterter, showable) VALUES(1, "CNY", "Yuan", "¥", 1);
 INSERT INTO currency (crc_id, nameme, unit, characterter, showable) VALUES(2, "USD", "Dollar", "$", 1);
+INSERT INTO currency (crc_id, nameme, unit, characterter, showable) VALUES(3, "JPY", "Yen", "￥", 1);
+INSERT INTO currency (crc_id, nameme, unit, characterter, showable) VALUES(4, "HKD", "Yen", "HK$", 1);
 

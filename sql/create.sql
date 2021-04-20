@@ -44,6 +44,7 @@ CREATE TABLE currency (
 CREATE TABLE account (
     acnt_id INTEGER PRIMARY KEY AUTOINCREMENT,
     crc_id INTEGER NOT NULL,
+    typepe TINYINT NOT NULL, -- 1:Normal, 2:Debet, 3:Loan
     nameme VARCHAR(32) NOT NULL,
     showable TINYINT NOT NULL,
     deleteable TINYINT NOT NULL
@@ -56,9 +57,9 @@ CREATE TABLE account_balance (
 
 CREATE TRIGGER add_account AFTER INSERT ON currency
 BEGIN
-    INSERT INTO account VALUES(NULL, new.crc_id, new.nameme || "_NORMAL", 1, 0);
-    INSERT INTO account VALUES(NULL, new.crc_id, new.nameme || "_DEBET", 1, 0);
-    INSERT INTO account VALUES(NULL, new.crc_id, new.nameme || "_LOAN", 1, 0);
+    INSERT INTO account VALUES(NULL, new.crc_id, 1, new.nameme || "_NORMAL", 1, 0);
+    INSERT INTO account VALUES(NULL, new.crc_id, 2, new.nameme || "_DEBET", 1, 0);
+    INSERT INTO account VALUES(NULL, new.crc_id, 3, new.nameme || "_LOAN", 1, 0);
 END;
 
 CREATE TRIGGER add_account_balance AFTER INSERT ON account

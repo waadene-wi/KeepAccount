@@ -78,16 +78,16 @@ class DB:
     def getAllAccountInfo(self, args):
         show_delete = args['show_delete']
         returnRaw = args['return_raw']
-        attrs = ['acnt_id', 'crc_id', 'nameme', 'showable', 'deleteable']
+        attrs = ['acnt_id', 'crc_id', 'nameme', 'typepe', 'showable', 'deleteable']
         condition = '' # 默认获取所有记录
         if show_delete == False:
             condition = 'showable = 1'
         return self.__selectData(attrs, 'account', condition, returnRaw)
 
-    def getAllAccountInfoGroupedByCurrency(self, args):
+    def getAllAccountInfoOrganizedByCurrency(self, args):
         show_delete = args['show_delete']
         returnRaw = args['return_raw']
-        attrs = ['acnt_id', 'crc_id', 'nameme', 'showable', 'deleteable']
+        attrs = ['acnt_id', 'crc_id', 'nameme', 'typepe', 'showable', 'deleteable']
         condition = '' # 默认获取所有记录
         if show_delete == False:
             condition = 'showable = 1'
@@ -296,10 +296,11 @@ class DB:
         begin_time = args['begin_time']
         end_time = args['end_time']
         crc_id = args['currency_id']
-        sqlStr = 'SELECT income_cat1.nameme, SUM(amount) FROM income_record\
-            LEFT JOIN account on income_record.acnt_id = account.acnt_id\
-            LEFT JOIN income_cat1 on income_record.cat1_id = income_cat1.cat1_id\
-            WHERE account.crc_id = %s and income_record.timeme BETWEEN %s AND %s GROUP BY income_record.cat1_id'%(crc_id, begin_time, end_time)
+        sqlStr = 'SELECT income_cat1.nameme, SUM(amount) FROM income_record \
+            LEFT JOIN account on income_record.acnt_id = account.acnt_id \
+            LEFT JOIN income_cat1 on income_record.cat1_id = income_cat1.cat1_id \
+            WHERE account.crc_id = %s and income_record.timeme >= %s AND income_record.timeme <= %s \
+            GROUP BY income_record.cat1_id'%(crc_id, begin_time, end_time)
         try:
             dbData = self.cursor.execute(sqlStr).fetchall()
         except:
@@ -315,10 +316,11 @@ class DB:
         begin_time = args['begin_time']
         end_time = args['end_time']
         crc_id = args['currency_id']
-        sqlStr = 'SELECT payment_cat1.nameme, SUM(amount) FROM payment_record\
-            LEFT JOIN account on payment_record.acnt_id = account.acnt_id\
-            LEFT JOIN payment_cat1 on payment_record.cat1_id = payment_cat1.cat1_id\
-            WHERE account.crc_id = %s and payment_record.timeme BETWEEN %s AND %s GROUP BY payment_record.cat1_id'%(crc_id, begin_time, end_time)
+        sqlStr = 'SELECT payment_cat1.nameme, SUM(amount) FROM payment_record \
+            LEFT JOIN account on payment_record.acnt_id = account.acnt_id \
+            LEFT JOIN payment_cat1 on payment_record.cat1_id = payment_cat1.cat1_id \
+            WHERE account.crc_id = %s and payment_record.timeme >= %s AND payment_record.timeme <= %s \
+            GROUP BY payment_record.cat1_id'%(crc_id, begin_time, end_time)
         try:
             dbData = self.cursor.execute(sqlStr).fetchall()
         except:
@@ -329,5 +331,31 @@ class DB:
         for row in dbData:
             ret.append(dict(zip(attrs, row)))
         return makeReturn(Error.SUCCESS, ret)
+
+    def getIncomeAndPaymentTendency(self, args):
+        begin_time = args['begin_time']
+        end_time = args['end_time']
+        crc_id = args['currency_id']
+        time_interval = args['time_interval'] # 保證值是正確的
+        table_name = ''
+        if time_interval == 'day':
+            table_name = 'daily_stat_record'
+        elif time_interval == 'month':
+            table_name = 'monthly_stat_record'
+        else: # year
+            table_name = 'annually_stat_record'
+        sqlStr = 'SELECT timeme, income, payment from %s LEFT JOIN currency ON %s.crc_id = currency.crc_id \
+            WHERE %s.crc_id = %s AND timeme >= %s AND timeme <= %s'%(table_name, table_name, table_name, crc_id, begin_time, end_time)
+        try:
+            dbData = self.cursor.execute(sqlStr).fetchall()
+        except:
+            self.logger.warning('query failed. sql:' + sqlStr)
+            return makeReturn(Error.DATABASE_ERROR)
+        attrs = ['timeme', 'income', 'payment']
+        ret = []
+        for row in dbData:
+            ret.append(dict(zip(attrs, row)))
+        return makeReturn(Error.SUCCESS, ret)
+
         
         

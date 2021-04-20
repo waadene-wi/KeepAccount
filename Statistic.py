@@ -42,4 +42,37 @@ class Statistic:
 
     def getPaymentCat1Percentage(self, args):
         return self.__getCat1Percentage('getPaymentCat1Percentage', args)
+
+    def getIncomeAndPaymentTendency(self, args):
+        checker = DictParamChecker()
+        checker.addParam('begin_time', 'string', True)
+        checker.addParam('end_time', 'string', True)
+        checker.addParam('currency_id', 'int', True)
+        checker.addParam('time_interval', 'str', True)
+        args = checker.check(args)
+        if type(args) == str:
+            self.logger.warning(args)
+            return makeReturn(Error.ILLEGAL_ARGS)
+        args = self.__specialInputArgsTransfer(args)
+        time_interval = args['time_interval']
+        time_format_str = ''
+        if time_interval == 'day':
+            time_format_str = '%Y-%m-%d'
+        elif time_interval == 'month':
+            time_format_str = '%Y-%m'
+        elif time_interval == 'year':
+            time_format_str = '%Y'
+        else:
+            return makeReturn(Error.ILLEGAL_ARGS)
+        ret = self.db.call('getIncomeAndPaymentTendency', args)
+        if ret['errno'] != Error.SUCCESS:
+            return ret
+        ret = ret['return']
+        for row in ret:
+            row['timeme'] = time.strftime(time_format_str, time.localtime(row['timeme']))
+            row['income'] /= 100
+            row['payment'] /= 100
+        return makeReturn(Error.SUCCESS, ret)
+        
+
         

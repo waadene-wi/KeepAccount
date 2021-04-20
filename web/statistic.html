@@ -13,8 +13,14 @@
                 margin-top: 8px;
                 margin-bottom: 8px;
             }
+            .one_chart {
+                float: left;
+            }
             #main_data {
                 margin-top: 28px;
+            }
+            #charts_area {
+                margin-top: 32px;
             }
         </style>
         <script type="text/javascript" src="/res/common.js"></script>
@@ -49,15 +55,6 @@
                 </select>
             </div>
             <div class="one_input_layout" >
-                <p class="input_line_element" >Grouped By:</p>
-                <select class="input_line_element" id="time_interval_select">
-                    <option class="time_interval_select_opt" value="month">Month</option>
-                    <option class="time_interval_select_opt" value="year">Year</option>
-                </select>
-            </div>
-        </div>
-        <div class="one_line_layout">
-            <div class="one_input_layout" >
                 <p class="input_line_element" >Currency:</p>
                 <select class="input_line_element" id="currency_select">
                     <!-- <option class="currency_select_opt" value="0"> </option> -->
@@ -71,7 +68,17 @@
             <input type="checkbox" value="payment_cat1_percentage" id="payment_cat1_percentage_check">Payment Cat1 Percentage</input>
         </div>
         <div class="one_line_layout">
-            <input type="checkbox" value="income_payment_tendency" id="income_payment_tendency_check">Income Payment Tendency</input>
+            <div class="one_input_layout" >
+                <input type="checkbox" value="income_payment_tendency" id="income_payment_tendency_check">Income Payment Tendency</input>
+            </div>
+            <div class="one_input_layout" >
+                <p class="input_line_element" >Time Interval:</p>
+                <select class="input_line_element" id="income_payment_tendency_time_interval_select">
+                    <option value="day">Day</option>
+                    <option value="month">Month</option>
+                    <option value="year">Year</option>
+                </select>
+            </div>
         </div>
         <button id="okay_button" onclick="onOkayClick()">Okay</button>
         <div id="charts_area" style="width: 800px;height:600px;">
@@ -84,7 +91,7 @@
             data = data.return;
             var chart = echarts.init(document.getElementById('income_cat1_percentage_chart'));
             var option = {
-                title:{text:'Income Cat1 Percentage'},
+                title: {text:'Income Cat1 Percentage'},
                 series: [{
                     name: 'Income Cat1 Percentage',
                     type: 'pie',
@@ -102,7 +109,7 @@
             data = data.return;
             var chart = echarts.init(document.getElementById('payment_cat1_percentage_chart'));
             var option = {
-                title:{text:'Income Cat1 Percentage'},
+                title: {text:'Income Cat1 Percentage'},
                 series: [{
                     name: 'Income Cat1 Percentage',
                     type: 'pie',
@@ -111,6 +118,29 @@
             };
             data.forEach(function(info) {
                 option.series[0].data.push({value:info.amount, name:info.cat1_name});
+            });
+            chart.setOption(option);
+        }
+
+        function onIncomeAndPaymentTendencyReceived(result) {
+            var data = JSON.parse(result);
+            data = data.return;
+            var chart = echarts.init(document.getElementById('income_payment_tendency_chart'));
+            var option = {
+                title: {text:'Income And Payment Tendency'},
+                legend: {data:['Income', 'Payment'], top:40},
+                xAxis: {data:[]},
+                yAxis: {},
+                grid:{x:60, y: 80},
+                series: [
+                    {name: 'Income', type:'line', data:[]},
+                    {name: 'Payment', type:'line', data:[]}
+                ]
+            };
+            data.forEach(function (info) {
+                option.xAxis.data.push(info.timeme);
+                option.series[0].data.push(info.income);
+                option.series[1].data.push(info.payment);
             });
             chart.setOption(option);
         }
@@ -125,17 +155,26 @@
             clearSubElement(charts_area_div, 'one_chart');
             is_checked = document.getElementById('income_cat1_percentage_check').checked;
             if(is_checked == true) {
-                addCharDiv('charts_area', 'income_cat1_percentage_chart', 'one_chart', '600px', '400px');
+                addCharDiv('charts_area', 'income_cat1_percentage_chart', 'one_chart', '380px', '380px');
                 uri = '/service/statistic/getIncomeCat1Percentage?begin_time='
                     + begin_time + '&end_time=' + end_time + '&currency_id=' + currency_id;
                 getUrlAsyn(uri, onIncomeCat1PercnetageReceived);
             }
             is_checked = document.getElementById('payment_cat1_percentage_check').checked;
             if(is_checked == true) {
-                addCharDiv('charts_area', 'payment_cat1_percentage_chart', 'one_chart', '600px', '400px');
+                addCharDiv('charts_area', 'payment_cat1_percentage_chart', 'one_chart', '380px', '380px');
                 uri = '/service/statistic/getPaymentCat1Percentage?begin_time='
                     + begin_time + '&end_time=' + end_time + '&currency_id=' + currency_id;
                 getUrlAsyn(uri, onPaymentCat1PercnetageReceived);
+            }
+            is_checked = document.getElementById('income_payment_tendency_check').checked;
+            if(is_checked == true) {
+                var time_interval = document.getElementById('income_payment_tendency_time_interval_select').value;
+                addCharDiv('charts_area', 'income_payment_tendency_chart', 'one_chart', '380px', '380px');
+                uri = '/service/statistic/getIncomeAndPaymentTendency?begin_time='
+                    + begin_time + '&end_time=' + end_time + '&currency_id=' + currency_id
+                    + '&time_interval=' + time_interval;
+                getUrlAsyn(uri, onIncomeAndPaymentTendencyReceived);
             }
         }
 

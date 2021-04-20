@@ -23,6 +23,6 @@ class Account:
 
     def getAllGroupedByCurrency(self, args):
         args = self.__handleSpecialArgs(args)
-        return self.db.call('getAllAccountInfoGroupedByCurrency', args)
+        return self.db.call('getAllAccountInfoOrganizedByCurrency', args)
 
     
