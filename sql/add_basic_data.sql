@@ -98,3 +98,6 @@ INSERT INTO currency (crc_id, nameme, unit, characterter, showable) VALUES(2, "U
 INSERT INTO currency (crc_id, nameme, unit, characterter, showable) VALUES(3, "JPY", "Yen", "￥", 1);
 INSERT INTO currency (crc_id, nameme, unit, characterter, showable) VALUES(4, "HKD", "Yen", "HK$", 1);
 
+-- 添加常用賬戶
+INSERT INTO account VALUES(NULL, 1, 1, "CNY_Financing", 1, 0);
+

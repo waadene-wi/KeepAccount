@@ -200,7 +200,6 @@ class DB:
         timeme = args['current_time']
         amount = args['amount']
         cat1_id = args['cat1_id']
-        crc_id = args['currency_id']
         src_acnt_id = args['src_account_id']
         dst_acnt_id = args['dst_account_id']
         description = args['description']

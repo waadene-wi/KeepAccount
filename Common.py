@@ -43,7 +43,7 @@ def timestampFromString(string):
     ts = time.strptime(string, "%Y-%m-%d %H:%M")
     return int(time.mktime(ts))
 
-def fenToYuanStr(fen):
+def fenIntToYuanStr(fen):
     '''把單位為（分）的整數轉換為單位為（元）的字符串'''
     isNegative = False
     if fen < 0:
@@ -58,3 +58,17 @@ def fenToYuanStr(fen):
     if isNegative == True:
         retStr = '-' + retStr
     return retStr
+
+def yuanStrToFenInt(yuan):
+    '''把單位為（元）的字符串轉換成單位為（分）的整數'''
+    fenStr = '0'
+    yuanAndFen = yuan.split('.')
+    if len(yuanAndFen) == 1:
+        fenStr = yuan + '00'
+    else: # len(yuanAndFen) == 2
+        fenPart = yuanAndFen[1]
+        if len(fenPart) == 1:
+            fenStr = yuan + fenPart + '0'
+        else: # len(fenPart) == 2
+            fenStr = yuan + fenPart[0:1]
+    return int(fenStr)

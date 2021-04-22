@@ -20,7 +20,7 @@ class Record:
         if 'end_time' in args:
             args['end_time'] = timestampFromString(args['end_time'])
         if 'amount' in args:
-            args['amount'] = args['amount'] + '00'
+            args['amount'] = yuanStrToFenInt(args['amount'])
         return args
 
     def __specialValueTransfer(self, rows):
@@ -28,7 +28,7 @@ class Record:
         没有返回值'''
         for i in range(0, len(rows)):
             if 'amount' in rows[i]:
-                rows[i]['amount'] = fenToYuanStr(rows[i]['amount'])
+                rows[i]['amount'] = fenIntToYuanStr(rows[i]['amount'])
             if 'timeme' in rows[i]:
                 rows[i]['timeme'] = timestampToString(rows[i]['timeme'])
         return rows

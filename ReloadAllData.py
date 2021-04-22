@@ -9,7 +9,10 @@ import Common
 import logging
 
 BACKUP_FILE_NAME = 'commit.backup'
-logger = None ################
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+logger = logging.getLogger('ReloadAllData')
+
+
 service_list = {}
 service_list['account'] = Account.Account(logger)
 service_list['category'] = Category.Category(logger)
