@@ -9,6 +9,7 @@ import json
 import logging
 import sqlite3
 import os
+import os.path
 
 path = os.path.abspath(__file__)
 dirname, useless = os.path.split(path)
@@ -28,13 +29,14 @@ service_list['budget'] = Budget.Budget(logger)
 service_list['currency'] = Currency.Currency(logger)
 
 # 删除数据库文件
-os.remove(DB_FILE_NAME)
+if os.path.exists(DB_FILE_NAME):
+    os.remove(DB_FILE_NAME)
 
 # 读取创建数据库SQL文件内容
-f = open(ROOT_DIR + 'sql/create.sql')
+f = open(ROOT_DIR + 'sql/create.sql', encoding='utf-8')
 create_sql_content = f.read()
 f.close()
-f = open(ROOT_DIR + 'sql/add_basic_data.sql')
+f = open(ROOT_DIR + 'sql/add_basic_data.sql', encoding='utf-8')
 add_basic_data_sql_content = f.read()
 f.close()
 
@@ -46,19 +48,20 @@ connect.commit()
 connect.close()
 
 # 读取backup文件恢复数据
-f = open(BACKUP_FILE_NAME)
-while True:
-    line = f.readline()
-    if line == '':
-        break
-    index = 0
-    first_BS = line.find(' ', 0)
-    service_name = line[0:first_BS]
-    second_BS = line.find(' ', first_BS + 1)
-    interfance_name = line[first_BS + 1 : second_BS]
-    args = json.loads(line[second_BS + 1:-1])
-    ret = getattr(service_list[service_name], interfance_name)(args)
-    if ret['errno'] != Common.Error.SUCCESS:
-        raise ValueError('execute failed! line: ' + line)
-f.close()
+if os.path.exists(BACKUP_FILE_NAME):
+    f = open(BACKUP_FILE_NAME, encoding='utf-8')
+    while True:
+        line = f.readline()
+        if line == '':
+            break
+        index = 0
+        first_BS = line.find(' ', 0)
+        service_name = line[0:first_BS]
+        second_BS = line.find(' ', first_BS + 1)
+        interfance_name = line[first_BS + 1 : second_BS]
+        args = json.loads(line[second_BS + 1:-1])
+        ret = getattr(service_list[service_name], interfance_name)(args)
+        if ret['errno'] != Common.Error.SUCCESS:
+            raise ValueError('execute failed! line: ' + line)
+    f.close()
 

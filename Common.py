@@ -63,12 +63,13 @@ def yuanStrToFenInt(yuan):
     '''把單位為（元）的字符串轉換成單位為（分）的整數'''
     fenStr = '0'
     yuanAndFen = yuan.split('.')
+    yuanPart = yuanAndFen[0]
     if len(yuanAndFen) == 1:
-        fenStr = yuan + '00'
+        fenStr = yuanPart + '00'
     else: # len(yuanAndFen) == 2
         fenPart = yuanAndFen[1]
         if len(fenPart) == 1:
-            fenStr = yuan + fenPart + '0'
+            fenStr = yuanPart + fenPart + '0'
         else: # len(fenPart) == 2
-            fenStr = yuan + fenPart[0:1]
+            fenStr = yuanPart + fenPart[0:1]
     return int(fenStr)
